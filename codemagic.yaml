@@ -1,0 +1,28 @@
+workflows:
+  ios-unsigned:
+    name: Build Unsigned IPA
+    instance_type: mac_mini_m1
+    max_build_duration: 60
+    environment:
+      xcode: latest
+    scripts:
+      - name: Extract Project
+        script: |
+          unzip -o ios.zip
+      - name: Build Archive
+        script: |
+          PROJECT_PATH=$(find . -name "*.xcodeproj" | head -n 1)
+          SCHEME_NAME=$(basename "$PROJECT_PATH" .xcodeproj)
+          xcodebuild archive \
+            -project "$PROJECT_PATH" \
+            -scheme "$SCHEME_NAME" \
+            -configuration Release \
+            -archivePath $PWD/build/RaedTranslate.xcarchive \
+            CODE_SIGNING_ALLOWED=NO
+      - name: Export Unsigned IPA
+        script: |
+          mkdir -p build/Payload
+          cp -r build/RaedTranslate.xcarchive/Products/Applications/*.app build/Payload/
+          cd build && zip -r RaedTranslate_Unsigned.ipa Payload
+    artifacts:
+      - build/*.ipa
