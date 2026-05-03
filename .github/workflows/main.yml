@@ -8,16 +8,27 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v4
 
+      - name: Extract Project Files
+        run: |
+          # کردنەوەی فایلە Zipـەکە
+          unzip ios.zip
+          
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest
 
-      - name: Build Archive
+      - name: Find Workspace and Build
         run: |
+          # گەڕان بەدوای فایلەکەدا لەناو ئەو شتانەی کە Extract کراون
+          WORKSPACE_PATH=$(find . -name "*.xcworkspace" | head -n 1)
+          SCHEME_NAME=$(basename "$WORKSPACE_PATH" .xcworkspace)
+          
+          echo "Found workspace at: $WORKSPACE_PATH"
+          
           xcodebuild archive \
-            -workspace ios/RaedTranslate.xcworkspace \
-            -scheme RaedTranslate \
+            -workspace "$WORKSPACE_PATH" \
+            -scheme "$SCHEME_NAME" \
             -configuration Release \
             -archivePath $PWD/build/RaedTranslate.xcarchive \
             CODE_SIGNING_ALLOWED=NO
