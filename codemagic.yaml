@@ -2,13 +2,16 @@ workflows:
   ios-unsigned:
     name: Build Unsigned IPA
     instance_type: mac_mini_m1
-    max_build_duration: 60
     environment:
       xcode: latest
     scripts:
       - name: Extract Project
         script: |
           unzip -o ios.zip
+      - name: Fix Median Dependencies
+        script: |
+          # ئەم دێڕە وا دەکات پڕۆژەکە کەمتر داوای سێرڤەری Median بکات
+          find . -name "project.pbxproj" -exec sed -i '' 's/remoteGlobalID/localID/g' {} +
       - name: Build Archive
         script: |
           PROJECT_PATH=$(find . -name "*.xcodeproj" | head -n 1)
@@ -18,7 +21,9 @@ workflows:
             -scheme "$SCHEME_NAME" \
             -configuration Release \
             -archivePath $PWD/build/RaedTranslate.xcarchive \
-            CODE_SIGNING_ALLOWED=NO
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            COMPILER_INDEX_STORE_ENABLE=NO
       - name: Export Unsigned IPA
         script: |
           mkdir -p build/Payload
