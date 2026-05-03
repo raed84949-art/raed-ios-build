@@ -10,24 +10,23 @@ jobs:
 
       - name: Extract Project Files
         run: |
-          # کردنەوەی فایلە Zipـەکە
-          unzip ios.zip
+          unzip -o ios.zip
           
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest
 
-      - name: Find Workspace and Build
+      - name: Build Archive
         run: |
-          # گەڕان بەدوای فایلەکەدا لەناو ئەو شتانەی کە Extract کراون
-          WORKSPACE_PATH=$(find . -name "*.xcworkspace" | head -n 1)
-          SCHEME_NAME=$(basename "$WORKSPACE_PATH" .xcworkspace)
+          # گەڕان بەدوای پڕۆژەکەدا
+          PROJECT_PATH=$(find . -name "*.xcodeproj" | head -n 1)
+          SCHEME_NAME=$(basename "$PROJECT_PATH" .xcodeproj)
           
-          echo "Found workspace at: $WORKSPACE_PATH"
+          echo "Found project at: $PROJECT_PATH"
           
           xcodebuild archive \
-            -workspace "$WORKSPACE_PATH" \
+            -project "$PROJECT_PATH" \
             -scheme "$SCHEME_NAME" \
             -configuration Release \
             -archivePath $PWD/build/RaedTranslate.xcarchive \
