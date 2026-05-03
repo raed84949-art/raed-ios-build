@@ -6,7 +6,7 @@ jobs:
     runs-on: macos-latest
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Xcode
         uses: maxim-lobanov/setup-xcode@v1
@@ -29,7 +29,7 @@ jobs:
           cd build && zip -r RaedTranslate_Unsigned.ipa Payload
 
       - name: Upload IPA
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: RaedTranslate-Package
           path: build/RaedTranslate_Unsigned.ipa
