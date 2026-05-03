@@ -1,0 +1,35 @@
+name: Build RaedTranslate IPA
+on: [push]
+
+jobs:
+  build:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Set up Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: latest
+
+      - name: Build Archive
+        run: |
+          xcodebuild archive \
+            -workspace ios/RaedTranslate.xcworkspace \
+            -scheme RaedTranslate \
+            -configuration Release \
+            -archivePath $PWD/build/RaedTranslate.xcarchive \
+            CODE_SIGNING_ALLOWED=NO
+
+      - name: Create Unsigned IPA
+        run: |
+          mkdir -p build/Payload
+          cp -r build/RaedTranslate.xcarchive/Products/Applications/*.app build/Payload/
+          cd build && zip -r RaedTranslate_Unsigned.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v3
+        with:
+          name: RaedTranslate-Package
+          path: build/RaedTranslate_Unsigned.ipa
